@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sign up — Tolumail</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-light">
+  <header class="site-header container">
+    <a class="brand" href="/">Tolumail</a>
+    <nav class="nav">
+      <a href="/">Home</a>
+      <a href="#pricing">Pricing</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </header>
+
+  <main class="container signup-page">
+    <section class="signup-card">
+      <h1>Create your account</h1>
+      <p class="muted">Start with a free 1,000 emails. Upgrade anytime.</p>
+
+      <form id="signupForm" class="form" autocomplete="on">
+        <label>
+          Company / Name
+          <input type="text" id="name" name="name" placeholder="Your company or name" required />
+        </label>
+
+        <label>
+          Business email
+          <input type="email" id="email" name="email" placeholder="email@yourdomain.com" required />
+        </label>
+
+        <label>
+          Password
+          <input type="password" id="password" name="password" minlength="8" placeholder="Choose a secure password" required />
+        </label>
+
+        <label class="plan-select">
+          Choose plan
+          <select id="plan" name="plan">
+            <option value="starter">Starter — Free (1,000/mo)</option>
+            <option value="pro">Pro — ₦15,000/mo</option>
+            <option value="business">Business — Contact Sales</option>
+          </select>
+        </label>
+
+        <button type="submit" class="btn-primary btn-block">Create account</button>
+        <p class="muted small">By creating an account you agree to our <a href="/terms.html">terms</a>.</p>
+
+        <div id="formMessage" class="form-message" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <aside class="signup-side">
+      <h4>Why Tolumail?</h4>
+      <ul>
+        <li>Fast API for transactional email</li>
+        <li>Marketing campaign tools</li>
+        <li>SPF / DKIM setup helpers</li>
+        <li>Clean analytics & billing</li>
+      </ul>
+      <div class="small muted">Have a question? <a href="/contact.html">Contact sales</a></div>
+    </aside>
+  </main>
+
+  <div class="footer">
+    <p>
+      &copy; <span id="year"></span> ToluMail. All rights reserved. |
+      <a href="#">Privacy Policy</a> |
+      <a href="#">Terms of Service</a>
+    </p>
+  </div>
+
+  <script>
+    // Automatically update the footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+
+  <script>
+    // Simple client-side submit that posts to /api/signup.
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msgEl = document.getElementById('formMessage');
+      msgEl.textContent = '';
+      const data = {
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value,
+        plan: document.getElementById('plan').value
+      };
+
+      // Minimal client validation
+      if (!data.email  || !data.password  ||  data.password.length < 8) {
+        msgEl.textContent = 'Please provide a valid email and password (8+ chars).';
+        msgEl.className = 'form-message error';
+        return;
+      }
+
+      msgEl.textContent = 'Creating account...';
+      msgEl.className = 'form-message';
+
+      try {
+        // Replace the URL below with your real backend endpoint
+        const res = await fetch('/api/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.message || 'Signup failed');
+        }
+
+        msgEl.textContent = 'Account created! Check your email to confirm.';
+        msgEl.className = 'form-message success';
+      } catch (err) {
+        msgEl.textContent = 'Error: ' + err.message;
+        msgEl.className = 'form-message error';
+      }
+    });
+  </script>
+</body>
+</html>
